@@ -11,6 +11,12 @@ class RequestHandler(BaseHTTPRequestHandler):
     self.path = self.path.lower()
     self.amarok = Amarok.Amarok()
 
+    if self.path == "/apple-touch-icon.png" or \
+       self.path == "/apple-touch-icon-precomposed.png":
+      # Icon for iPhone webclip
+      # See https://developer.apple.com/webapps/docs_iphone/documentation/AppleApplications/Reference/SafariWebContent/OptimizingforSafarioniPhone/chapter_3_section_4.html
+      self.path = "static/apple-touch-icon.png"
+
     if self.path.find("static/") >= 0:
       self._Static()
     elif self.path == "/next":
