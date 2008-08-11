@@ -1,0 +1,42 @@
+<html>
+<head>
+  <title>Home</title>
+  <style type="text/css">
+    a img {border: none}
+  </style>
+  <!-- Redirect to "/" after the track finishes -->
+  <meta http-equiv="Refresh" content="${track.time_left};/">
+
+  <!-- iPhone settings: Page should cover the full screen -->
+  <meta name="viewport" content="width=device-width, height=device-height">
+</head>
+<body>
+<table width=100%>
+  <tr>
+    <td><a href="/prev"><img src="static/prev.png" alt="Previous"/></a></td>
+    <td><a href="/playpause">
+      %if amarok.IsPlaying():
+        <img src="static/pause.png" alt="Pause"/>
+      %else:
+        <img src="static/play.png" alt="Play"/>
+      %endif
+    </a></td>
+    <td><a href="/next"><img src="static/next.png" alt="Next"/></a></td>
+  </tr>
+</table>
+<center><h3>Current Track</h3></center>
+<table border=0>
+  <tr>
+    <td><b>Title:</b></td>
+    <td>${track.title}</td>
+  </tr>
+  <tr>
+    <td><b>Album:</b></td>
+    <td>${track.album}</td>
+  </tr>
+  <tr>
+    <td><b>Artist:</b></td>
+    <td>${track.artist}</td>
+  </tr>
+</table>
+</body>

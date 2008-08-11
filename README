@@ -1,0 +1,2 @@
+apt-get install python-mako python-dcop python-wsgiref
+
