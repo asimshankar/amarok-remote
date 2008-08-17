@@ -1,5 +1,6 @@
 import pydcop
 import logging
+import util
 
 class TrackInfo:
   def __init__(self, dict):
@@ -24,6 +25,7 @@ class Amarok:
       self._AddError("No 'amarok' application registered with DCOP")
       return
     self._player = self._app.player
+    self._playlist = self._app.playlist
     if not self._player:
       self._AddError("No 'player' object in the 'amarok' app")
 
@@ -40,6 +42,9 @@ class Amarok:
     if len(self._errors) > 0: return False
     self._player.prev()
     return True
+
+  def JumpTo(self, trackid):
+    self._playlist.playByIndex(trackid)
 
   def PlayPause(self):
     if len(self._errors) > 0: return False
@@ -59,3 +64,20 @@ class Amarok:
 
   def IsPlaying(self):
     return self._player.isPlaying()
+
+  def MatchingTracks(self, query, max_results=5):
+    # TODO: We match 'query' as a full substring instead of considering it
+    # as an AND of unigrams
+    if len(query) == 0: return []
+    candidates = self._playlist.filenames()
+    results = []
+    index = 0
+    for c in candidates:
+      c = util.FileWithoutExtension(c) 
+      if c.lower().find(query) >= 0:
+        results.append((index, c))
+        if len(results) > max_results:
+          break
+      index = index + 1
+    return results
+
