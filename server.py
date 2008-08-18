@@ -3,6 +3,7 @@ import os
 
 from BaseHTTPServer import BaseHTTPRequestHandler
 from mako.template import Template
+from mako.lookup import TemplateLookup
 
 import amarok as Amarok
 import util
@@ -27,8 +28,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._NotFound()
     elif topdir == "ajax":
       self._RunAjax(suffix)
-    elif self.path == "":
-      self._RenderHome()
+    elif topdir == "":
+      self._Render(suffix)
     else:
       self._NotFound()
 
@@ -69,14 +70,26 @@ class RequestHandler(BaseHTTPRequestHandler):
     self.end_headers()
     self.wfile.write(output)
 
-  def _RenderHome(self):
-    home_template = Template(filename="templates/home.html")
-    self.send_response(200)
-    self.send_header('Content-Type', 'text/html')
-    self.end_headers()
+  def _Render(self, page):
+    lookup = TemplateLookup(directories=["templates"],
+                            module_directory="tmp/mako")
+    template = None
+    args = {}
     amarok = Amarok.Amarok()
-    self.wfile.write(home_template.render(track=amarok.CurrentTrack(),
-                                          amarok=amarok))
+    if page == "" or page == "/home":
+      template = lookup.get_template("home.html")
+      args['track'] = amarok.CurrentTrack()
+      args['amarok'] = amarok
+    
+    if not template:
+      self._NotFound()
+    else:
+      output = template.render(**args)
+      self.send_response(200)
+      self.send_header('Content-Type', 'text/html')
+      self.send_header('Content-Length', len(output))
+      self.end_headers()
+      self.wfile.write(output)
 
   def _Static(self, path):
     path = os.path.join("static", path)
