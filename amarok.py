@@ -1,5 +1,6 @@
 import pydcop
 import logging
+import os
 import util
 
 class TrackInfo:
@@ -73,7 +74,7 @@ class Amarok:
     results = []
     index = 0
     for c in candidates:
-      c = util.FileWithoutExtension(c) 
+      c = os.path.splitext(c)[0]
       if c.lower().find(query) >= 0:
         results.append((index, c))
         if len(results) > max_results:

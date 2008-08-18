@@ -1,15 +1,11 @@
-import logging
 import urllib
 
-def FileExtension(filename):
-  pos = filename.rfind('.')
-  if pos == -1: return ''
-  return filename[pos+1:]
-
-def FileWithoutExtension(filename):
-  pos = filename.rfind('.')
-  if pos == -1: return filename
-  return filename[0:pos]
+def SplitPath(path):
+  seppos = path.find('/')
+  if seppos < 0:
+    return ('', path)
+  else:
+    return (path[0:seppos], path[seppos+1:])
 
 def ParseRequestPath(path):
   path = path.lower()

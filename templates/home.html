@@ -12,15 +12,15 @@
 <body>
 <table width=100%>
   <tr>
-    <td><a href="/prev"><img src="static/prev.png" alt="Previous"/></a></td>
-    <td><a href="/playpause">
+    <td><a href="cmd/prev"><img src="static/prev.png" alt="Previous"/></a></td>
+    <td><a href="cmd/playpause">
       %if amarok.IsPlaying():
         <img src="static/pause.png" alt="Pause"/>
       %else:
         <img src="static/play.png" alt="Play"/>
       %endif
     </a></td>
-    <td><a href="/next"><img src="static/next.png" alt="Next"/></a></td>
+    <td><a href="cmd/next"><img src="static/next.png" alt="Next"/></a></td>
   </tr>
 </table>
 <table border=0>
