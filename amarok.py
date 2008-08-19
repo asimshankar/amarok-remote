@@ -3,20 +3,44 @@ import logging
 import os
 import util
 
-class TrackInfo:
-  def __init__(self, dict):
-    for k in dict:
-      if not self.__dict__.has_key(k):
-        self.__dict__[k] = dict.get(k)
-      else:
-        logging.warning("TrackInfo already has a member: " + str(k))
+class _DictionaryWrapper(object):
+  """Wrapper around a public and private dictionary.
+
+  Attribute-like access provided over the keys of the dictionaries, with
+  the contents in the public dictionary winning in case of conflict.
+
+  The public dictionary can be accessed using public(), so methods that want
+  to export it can.
+
+  Note that mutations are not allowed through attributes"""
+  def __init__(self, public_dict, private_dict = {}):
+    self.__dict__["_public"] = public_dict
+    self.__dict__["_private"] = private_dict
 
   def __str__(self):
     ret = ""
-    for k in self.__dict__:
-      if not k.startswith("_"):
-        ret += "%s: %s\n" % (k, self.__dict__.get(k))
+    for (k, v) in self._public.items():
+      ret += "%s: %s\n" % (k, v)
+    for (k, v) in self._private.items():
+      ret += "(%s: %s)\n" % (k, v)
     return ret
+
+  def public(self):
+    return self._public
+
+  def __getattr__(self, name):
+    if self._public.has_key(name):
+      return self._public.get(name)
+    elif self._private.has_key(name):
+      return self._private.get(name)
+    else:
+      return object.__getattribute__(self, name)
+
+  def __setattr__(self, name, value):
+    if self.__dict__.has_key(name):
+      self.__dict__[name] = value
+    else:
+      raise KeyError("Attribute mutation for dictionaries not supported")
 
 class Amarok:
   def __init__(self):
@@ -54,14 +78,25 @@ class Amarok:
 
   def CurrentTrack(self):
     if len(self._errors) > 0: return {}
-    dict = {}
-    dict['title'] = self._player.title()
-    dict['album'] = self._player.album()
-    dict['artist'] = self._player.artist()
+    public = {}
+    public['title'] = self._player.title()
+
+    album = self._player.album()
+    if album: public['album'] = album
+
+    artist = self._player.artist()
+    if artist: public['artist'] = artist
+
+    # REMOVE THIS
+    public['album'] = album
+    public['artist'] = artist
+
     totaltime = self._player.trackTotalTime()
-    dict['total_time'] = totaltime
-    dict['time_left'] = totaltime - self._player.trackCurrentTime()
-    return TrackInfo(dict)
+    currtime = self._player.trackCurrentTime()
+    private = {}
+    private['total_time'] = totaltime
+    private['time_left'] = currtime - totaltime
+    return _DictionaryWrapper(public, private)
 
   def IsPlaying(self):
     return self._player.isPlaying()
@@ -69,7 +104,7 @@ class Amarok:
   def MatchingTracks(self, query, max_results=5):
     # TODO: We match 'query' as a full substring instead of considering it
     # as an AND of unigrams
-    if len(query) == 0: return []
+    if not query or not len(query): return []
     candidates = self._playlist.filenames()
     results = []
     index = 0

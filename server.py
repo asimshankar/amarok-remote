@@ -1,5 +1,6 @@
 import logging
 import os
+import simplejson
 
 from BaseHTTPServer import BaseHTTPRequestHandler
 from mako.template import Template
@@ -56,19 +57,39 @@ class RequestHandler(BaseHTTPRequestHandler):
     return success
 
   def _RunAjax(self, cmd):
-    output = ""
+    outdict = {}
+    amarok = Amarok.Amarok()
     if cmd == "search":
       output = self._Search()
+      self.send_response(200)
+      self.send_header('Content-Type', 'text/html')
+      self.end_headers()
+      self.wfile.write(output)
+      return
+    elif cmd == "status":
+      outdict = amarok.CurrentTrack().public()
+    elif cmd == "playpause":
+      amarok.PlayPause()
+      outdict['playing'] = amarok.IsPlaying()
+    elif cmd == "next":
+      amarok.Next()
+      outdict = amarok.CurrentTrack().public()
+    elif cmd == "prev":
+      amarok.Prev()
+      outdict = amarok.CurrentTrack().public()
     else:
       logging.error("Unrecognized ajax command: %s in request %s" % (cmd,
                                                                      self.path))
       self._NotFound()
       return
-
+    # Using separators for compact JSON representation
+    output = simplejson.dumps(outdict, separators=(',', ':'))
     self.send_response(200)
     self.send_header('Content-Type', 'text/html')
+    self.send_header('Content-Length', len(output))
     self.end_headers()
     self.wfile.write(output)
+
 
   def _Render(self, page):
     lookup = TemplateLookup(directories=["templates"],
