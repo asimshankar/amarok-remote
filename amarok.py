@@ -80,16 +80,8 @@ class Amarok:
     if len(self._errors) > 0: return {}
     public = {}
     public['title'] = self._player.title()
-
-    album = self._player.album()
-    if album: public['album'] = album
-
-    artist = self._player.artist()
-    if artist: public['artist'] = artist
-
-    # REMOVE THIS
-    public['album'] = album
-    public['artist'] = artist
+    public['album'] = self._player.album()
+    public['artist'] = self._player.artist()
 
     totaltime = self._player.trackTotalTime()
     currtime = self._player.trackCurrentTime()

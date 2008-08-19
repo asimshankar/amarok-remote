@@ -7,7 +7,7 @@
 <%def name="Content()">
 <table width=100%>
   <tr>
-    <td><a href="cmd/prev"><img src="static/prev.png" alt="Previous"/></a></td>
+    <td><a href="javascript:Status('prev')"><img src="static/prev.png" alt="Previous"/></a></td>
     <td><a href="cmd/playpause">
       %if amarok.IsPlaying():
         <img src="static/pause.png" alt="Pause"/>
@@ -15,21 +15,21 @@
         <img src="static/play.png" alt="Play"/>
       %endif
     </a></td>
-    <td><a href="cmd/next"><img src="static/next.png" alt="Next"/></a></td>
+    <td><a href="javascript:Status('next')"><img src="static/next.png" alt="Next"/></a></td>
   </tr>
 </table>
 <table border=0>
   <tr>
     <td><b>Title:</b></td>
-    <td>${track.title}</td>
+    <td id="title">${track.title}</td>
   </tr>
   <tr>
     <td><b>Album:</b></td>
-    <td>${track.album}</td>
+    <td id="album">${track.album}</td>
   </tr>
   <tr>
     <td><b>Artist:</b></td>
-    <td>${track.artist}</td>
+    <td id="artist">${track.artist}</td>
   </tr>
 </table>
 <center>

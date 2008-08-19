@@ -37,11 +37,7 @@ class RequestHandler(BaseHTTPRequestHandler):
   def _RunCommand(self, cmd):
     amarok = Amarok.Amarok()
     success = True
-    if cmd == "next":
-      amarok.Next()
-    elif cmd == "prev":
-      amarok.Prev()
-    elif cmd == "playpause":
+    if cmd == "playpause":
       amarok.PlayPause()
     elif cmd == "jumpto":
       track = self.params.get("t")
