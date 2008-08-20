@@ -37,9 +37,7 @@ class RequestHandler(BaseHTTPRequestHandler):
   def _RunCommand(self, cmd):
     amarok = Amarok.Amarok()
     success = True
-    if cmd == "playpause":
-      amarok.PlayPause()
-    elif cmd == "jumpto":
+    if cmd == "jumpto":
       track = self.params.get("t")
       if track is not None:
         try:
@@ -55,29 +53,49 @@ class RequestHandler(BaseHTTPRequestHandler):
   def _RunAjax(self, cmd):
     outdict = {}
     amarok = Amarok.Amarok()
+    status_rpc = True
+    error = False
     if cmd == "search":
       output = self._Search()
       self.send_response(200)
       self.send_header('Content-Type', 'text/html')
       self.end_headers()
       self.wfile.write(output)
+      status_rpc = False
       return
     elif cmd == "status":
-      outdict = amarok.CurrentTrack().public()
+      pass
+    elif cmd == "jumpto":
+      track = self.params.get("t")
+      if not track:
+        logging.error("No track specified to jumpto request")
+        error = True
+      else:
+        try:
+          track = int(track)
+          amarok.JumpTo(track)
+        except ValueError:
+          logging.error("Invalid jumpto request: track = %s" % track)
+          error = True
     elif cmd == "playpause":
       amarok.PlayPause()
-      outdict['playing'] = amarok.IsPlaying()
     elif cmd == "next":
       amarok.Next()
-      outdict = amarok.CurrentTrack().public()
     elif cmd == "prev":
       amarok.Prev()
-      outdict = amarok.CurrentTrack().public()
     else:
       logging.error("Unrecognized ajax command: %s in request %s" % (cmd,
                                                                      self.path))
+      error = True
+
+    if error:
       self._NotFound()
       return
+
+    if status_rpc:
+      outdict['track'] = amarok.CurrentTrack().public()
+      outdict['playing'] = amarok.IsPlaying()
+
     # Using separators for compact JSON representation
     output = simplejson.dumps(outdict, separators=(',', ':'))
     self.send_response(200)

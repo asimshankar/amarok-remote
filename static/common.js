@@ -18,3 +18,21 @@ function CreateXMLHttpRequest() {
  return ret
 }
 
+function SendRPC(url, callback) {
+  var xmlhttp = CreateXMLHttpRequest();
+  if (xmlhttp == null) {
+    alert("AJAX doesn't seem to be supported by your browser. Can't search");
+    return;
+  }
+  xmlhttp.onreadystatechange = function() {
+    if (xmlhttp.readyState == 4) {  // 4 = COMPLETED
+      callback(xmlhttp.responseText);
+    }
+  };
+  // Add a random number to prevent the server from using a cached file??
+  // TODO: Is this really necessary, especially given our webserver?
+  var sep = url.indexOf("?") < 0 ? "?" : "&";
+  url = url + sep + "rnd=" + Math.random();
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send(null);
+}
