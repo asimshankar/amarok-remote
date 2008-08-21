@@ -22,11 +22,6 @@ class RequestHandler(BaseHTTPRequestHandler):
     (topdir, suffix) = util.SplitPath(self.path)
     if topdir == "static":
       self._Static(suffix)
-    elif topdir == "cmd":
-      if self._RunCommand(suffix):
-        self._RedirectHome()
-      else:
-        self._NotFound()
     elif topdir == "ajax":
       self._RunAjax(suffix)
     elif topdir == "":
@@ -34,35 +29,16 @@ class RequestHandler(BaseHTTPRequestHandler):
     else:
       self._NotFound()
 
-  def _RunCommand(self, cmd):
-    amarok = Amarok.Amarok()
-    success = True
-    if cmd == "jumpto":
-      track = self.params.get("t")
-      if track is not None:
-        try:
-          track = int(track)
-          amarok.JumpTo(track)
-        except ValueError:
-          logging.error("Invalid jumpto request: track = %s" % track)
-    else:
-      logging.error("Unrecognized command: %s in request %s" % (cmd, self.path))
-      success = False
-    return success
-
   def _RunAjax(self, cmd):
-    outdict = {}
+    output = None
     amarok = Amarok.Amarok()
-    status_rpc = True
     error = False
     if cmd == "search":
-      output = self._Search()
-      self.send_response(200)
-      self.send_header('Content-Type', 'text/html')
-      self.end_headers()
-      self.wfile.write(output)
-      status_rpc = False
-      return
+      query = self.params.get("q")
+      output = []
+      if query:
+        for r in amarok.MatchingTracks(query):
+          output.append({ 'id' : r[0], 'name': r[1] })
     elif cmd == "status":
       pass
     elif cmd == "jumpto":
@@ -92,18 +68,18 @@ class RequestHandler(BaseHTTPRequestHandler):
       self._NotFound()
       return
 
-    if status_rpc:
-      outdict['track'] = amarok.CurrentTrack().public()
-      outdict['playing'] = amarok.IsPlaying()
+    if output is None:
+      output = {}
+      output['track'] = amarok.CurrentTrack().public()
+      output['playing'] = amarok.IsPlaying()
 
     # Using separators for compact JSON representation
-    output = simplejson.dumps(outdict, separators=(',', ':'))
+    out_text = simplejson.dumps(output, separators=(',', ':'))
     self.send_response(200)
     self.send_header('Content-Type', 'text/html')
-    self.send_header('Content-Length', len(output))
+    self.send_header('Content-Length', len(out_text))
     self.end_headers()
-    self.wfile.write(output)
-
+    self.wfile.write(out_text)
 
   def _Render(self, page):
     lookup = TemplateLookup(directories=["templates"],
@@ -163,18 +139,6 @@ class RequestHandler(BaseHTTPRequestHandler):
     self.send_response(301)
     self.send_header('Location', '/')
     self.end_headers()
-
-  def _Search(self):
-    amarok = Amarok.Amarok()
-    output = ""
-    query = self.params.get("q")
-    if query:
-      results = amarok.MatchingTracks(query)
-      for r in results:
-        output += "<a href=/cmd/jumpto?t=%d>%s</a>&nbsp;&nbsp;" % (r[0], r[1])
-      if len(output) == 0:
-        output = "No matching tracks"
-    return output
 
   def _NotFound(self):
     message = "File not found"

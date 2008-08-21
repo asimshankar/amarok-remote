@@ -93,7 +93,7 @@ class Amarok:
   def IsPlaying(self):
     return self._player.isPlaying()
 
-  def MatchingTracks(self, query, max_results=5):
+  def MatchingTracks(self, query, max_results=7):
     # TODO: We match 'query' as a full substring instead of considering it
     # as an AND of unigrams
     if not query or not len(query): return []
@@ -104,7 +104,7 @@ class Amarok:
       c = os.path.splitext(c)[0]
       if c.lower().find(query) >= 0:
         results.append((index, c))
-        if len(results) > max_results:
+        if len(results) >= max_results:
           break
       index = index + 1
     return results
