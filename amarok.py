@@ -87,7 +87,7 @@ class Amarok:
     currtime = self._player.trackCurrentTime()
     private = {}
     private['total_time'] = totaltime
-    private['time_left'] = currtime - totaltime
+    private['time_left'] = totaltime - currtime
     return _DictionaryWrapper(public, private)
 
   def IsPlaying(self):
