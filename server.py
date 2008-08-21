@@ -120,11 +120,11 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     content_type = ''
     extension = os.path.splitext(path)[1]
-    if extension == "png":
+    if extension == ".png":
       content_type = "images/jpeg"
-    elif extension == "js":
+    elif extension == ".js":
       content_type = "text/javascript"
-    elif extension == "css":
+    elif extension == ".css":
       content_type = "text/css"
     else:
       content_type = "images/jpeg"
