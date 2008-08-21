@@ -12,7 +12,7 @@ function Search() {
     for (var i = 0; i < results.length; ++i) {
       var r = results[i];
       if (i != 0) {
-        txt = "&mdash; ";
+        txt = " &mdash; ";
       } else {
         txt = "";
       }
