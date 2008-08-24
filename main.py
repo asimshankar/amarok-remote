@@ -6,11 +6,36 @@ import os
 import sys
 
 from BaseHTTPServer import HTTPServer
+from BaseHTTPServer import BaseHTTPRequestHandler
 
-import server
+import handler
 
 program_name = ""
-def usage():
+
+class BaseHTTPRequestHandlerRequest(handler.RequestInterface):
+  def __init__(self, req):
+    self._request = req;
+
+  def Path(self):
+    return self._request.path
+
+  def Respond(self, code = 200, headers = {}, txt = ''):
+    self._request.send_response(code)
+    headers['Content-Length'] = len(txt)
+    for (k, v) in headers.items():
+      self._request.send_header(k, v)
+    self._request.end_headers()
+    self._request.wfile.write(txt)
+
+
+class RequestHandler(BaseHTTPRequestHandler):
+  def do_GET(self):
+    r = BaseHTTPRequestHandlerRequest(self)
+    h = handler.Handler(r)
+    h.Get()
+
+
+def Usage():
   global program_name
   print """
 Usage: %s [options]
@@ -35,13 +60,13 @@ def main():
   except getopt.GetoptError, e:
     logging.error(str(e))
     print "Bad commandline arguments: " + str(e)
-    usage()
+    Usage()
     sys.exit(2)
 
   port = 8080
   for o,a in opts:
     if o in ("-h", "--help"):
-      usage()
+      Usage()
       sys.exit()
     elif o in ("-p", "--port"):
       port = int(a)
@@ -49,7 +74,7 @@ def main():
       assert False, "Unhandled argument"
 
   try:
-    http = HTTPServer(('', port), server.RequestHandler)
+    http = HTTPServer(('', port), RequestHandler)
     logging.info("Started HTTPServer. PID: %d. Port %d" % (os.getpid(), port))
     http.serve_forever()
   except KeyboardInterrupt:

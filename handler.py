@@ -2,17 +2,29 @@ import logging
 import os
 import simplejson
 
-from BaseHTTPServer import BaseHTTPRequestHandler
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
 import amarok as Amarok
 import util
 
-class RequestHandler(BaseHTTPRequestHandler):
-  def do_GET(self):
-    (self.path, self.params) = util.ParseRequestPath(self.path)
+class RequestInterface:
+  """Generic interface for Request object used by the Handler class
 
+  This interface is more to document what needs to be implemented"""
+  def Respond(self, code, headers, txt):
+    raise Exception("Respond() not implemented")
+
+  def Path(self):
+    raise Exception("Path() not implemented")
+
+
+class Handler:
+  def __init__(self, request):
+    self.request = request
+
+  def Get(self):
+    (self.path, self.params) = util.ParseRequestPath(self.request.Path())
     if self.path == "apple-touch-icon.png" or \
        self.path == "apple-touch-icon-precomposed.png":
       # Icon for iPhone webclip
@@ -75,11 +87,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     # Using separators for compact JSON representation
     out_text = simplejson.dumps(output, separators=(',', ':'))
-    self.send_response(200)
-    self.send_header('Content-Type', 'text/html')
-    self.send_header('Content-Length', len(out_text))
-    self.end_headers()
-    self.wfile.write(out_text)
+    headers = { 'Content-Type': 'text/plain' }
+    self.request.Respond(code = 200, headers = headers, txt = out_text)
 
   def _Render(self, page):
     lookup = TemplateLookup(directories=["templates"],
@@ -96,11 +105,8 @@ class RequestHandler(BaseHTTPRequestHandler):
       self._NotFound()
     else:
       output = template.render(**args)
-      self.send_response(200)
-      self.send_header('Content-Type', 'text/html')
-      self.send_header('Content-Length', len(output))
-      self.end_headers()
-      self.wfile.write(output)
+      headers = { 'Content-Type': 'text/html' }
+      self.request.Respond(code = 200, headers = headers, txt = output)
 
   def _Static(self, path):
     path = os.path.join("static", path)
@@ -129,21 +135,14 @@ class RequestHandler(BaseHTTPRequestHandler):
     else:
       content_type = "images/jpeg"
 
-    self.send_response(200)
-    self.send_header('Content-Type', content_type)
-    self.send_header('Content-Length', len(data))
-    self.end_headers()
-    self.wfile.write(data)
+    headers = { 'Content-Type': content_type }
+    self.request.Respond(code = 200, headers = headers, txt = data)
 
   def _RedirectHome(self):
-    self.send_response(301)
-    self.send_header('Location', '/')
-    self.end_headers()
+    headers = { 'Location': '/' }
+    self.request.Respond(code = 301, headers = headers) 
 
   def _NotFound(self):
     message = "File not found"
-    self.send_response(404)
-    self.send_header('Content-Type', 'text/html')
-    self.send_header('Content-Length', len(message))
-    self.end_headers()
-    self.wfile.write(message)
+    headers = { 'Content-Type': 'text/html' }
+    self.request.Respond(code = 400, headers = headers, txt = message)
