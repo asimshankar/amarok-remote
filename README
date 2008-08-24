@@ -1,2 +1,3 @@
-apt-get install python-mako python-dcop python-wsgiref python-simplejson
+# Using dcopext from python-kde3 on ubuntu
+apt-get install python-mako python-wsgiref python-simplejson python-kde3
 

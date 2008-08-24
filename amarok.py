@@ -1,4 +1,4 @@
-import pydcop
+import dcopext
 import logging
 import os
 import util
@@ -42,17 +42,45 @@ class _DictionaryWrapper(object):
     else:
       raise KeyError("Attribute mutation for dictionaries not supported")
 
+class _SafeDCOPMeth:
+  def __init__(self, dcop_method):
+    self._dcop_method = dcop_method
+
+  def __call__(self, *args):
+    (ok, result) = self._dcop_method.__call__(*args)
+    if not ok:
+      raise RuntimeError(str(ok) + " -- " + str(result))
+    return result
+
+  def __str__(self):
+    return "SafeDCOPMeth(" + str(self._dcop_method) + ")"
+
+
+class _SafeDCOPObj:
+  def __init__(self, dcop_object):
+    self.__dict__['_dcop_object'] = dcop_object
+
+  def __getattr__(self, name):
+    obj = self.__dict__['_dcop_object']
+    ret = _SafeDCOPMeth(obj.__getattr__(name))
+    return ret
+
+  def __str__(self):
+    return "SafeDCOPObj(" + str(self._dcop_object) + ")"
+
+
 class Amarok:
   def __init__(self):
-    self._app = pydcop.anyAppCalled("amarok")
+    client = dcopext.DCOPClient()
+    if not client.attach():
+      logging.fatal("Unable to attach to the DCOP server")
+    self._app = dcopext.DCOPApp("amarok", client)
     self._errors = []
     if not self._app:
       self._AddError("No 'amarok' application registered with DCOP")
       return
-    self._player = self._app.player
-    self._playlist = self._app.playlist
-    if not self._player:
-      self._AddError("No 'player' object in the 'amarok' app")
+    self._player = _SafeDCOPObj(self._app.player)
+    self._playlist = _SafeDCOPObj(self._app.playlist)
 
   def _AddError(self, error):
     self._errors.append(error)
@@ -97,7 +125,7 @@ class Amarok:
     # TODO: We match 'query' as a full substring instead of considering it
     # as an AND of unigrams
     if not query or not len(query): return []
-    candidates = self._playlist.filenames()
+    candidates = [unicode(x) for x in self._playlist.filenames()]
     results = []
     index = 0
     for c in candidates:
