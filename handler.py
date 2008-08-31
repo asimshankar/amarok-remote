@@ -71,6 +71,15 @@ class Handler:
       amarok.Next()
     elif cmd == "prev":
       amarok.Prev()
+    elif cmd == "changevolume":
+      ticks = self.params.get("v")
+      if ticks:
+        try:
+          ticks = int(ticks)
+          amarok.SetVolumeRelative(ticks)
+        except ValueError:
+          logging.error("Invalid changevolume request: ticks = %s" % ticks)
+          error = True
     else:
       logging.error("Unrecognized ajax command: %s in request %s" % (cmd,
                                                                      self.path))
@@ -82,8 +91,11 @@ class Handler:
 
     if output is None:
       output = {}
-      output['track'] = amarok.CurrentTrack().public()
+      track = amarok.CurrentTrack()
+      output['track'] = track.public()
       output['playing'] = amarok.IsPlaying()
+      output['volume'] = amarok.Volume()
+      output['time_left'] = track.time_left
 
     # Using separators for compact JSON representation
     out_text = simplejson.dumps(output, separators=(',', ':'))

@@ -121,6 +121,12 @@ class Amarok:
   def IsPlaying(self):
     return self._player.isPlaying()
 
+  def Volume(self):
+    return self._player.getVolume()
+
+  def SetVolumeRelative(self, ticks):
+    return self._player.setVolumeRelative(ticks)
+
   def MatchingTracks(self, query, max_results=7):
     # TODO: We match 'query' as a full substring instead of considering it
     # as an AND of unigrams

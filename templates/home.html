@@ -2,18 +2,18 @@
 <%def name="Head()">
   <title>Amarok Remote</title>
   <script src="/static/home.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var refresh_timeout = null;
+  </script>
 </%def>
 
 <%def name="Content()">
+<body onload="Status('status')">
 <table width="100%">
   <tr>
     <td><a href="javascript:Status('prev')"><img src="static/prev.png" alt="Previous"/></a></td>
     <td><a href="javascript:Status('playpause')">
-      %if amarok.IsPlaying():
-        <img id="playbutton" src="static/pause.png" alt="Pause"/>
-      %else:
-        <img id="playbutton" src="static/play.png" alt="Play"/>
-      %endif
+       <img id="playbutton" src="static/pause.png" alt="PlayPause"/>
     </a></td>
     <td><a href="javascript:Status('next')"><img src="static/next.png" alt="Next"/></a></td>
   </tr>
@@ -21,22 +21,37 @@
 <table border=0>
   <tr>
     <td><b>Title:</b></td>
-    <td id="title">${track.title}</td>
+    <td id="title"></td>
   </tr>
   <tr>
     <td><b>Album:</b></td>
-    <td id="album">${track.album}</td>
+    <td id="album"></td>
   </tr>
   <tr>
     <td><b>Artist:</b></td>
-    <td id="artist">${track.artist}</td>
+    <td id="artist"></td>
+  </tr>
+  <tr>
+    <td><b>Volume:</b></td>
+    <td>
+      <a href="javascript:ChangeVolume(10)">
+      <img src="static/plus.png" alt="up" id="volup">
+      </a>
+      &nbsp;&nbsp;<span id="volume"></span>&nbsp;&nbsp;
+      <a href="javascript:ChangeVolume(-10)">
+      <img src="static/minus.png" alt="down" id="voldown">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td><b>Search:</b></td>
+    <td>
+      <form name="form" action="">
+        <input type="text" size="30" name="query" onkeyup="Search()"/><br/>
+        <span id="suggestions"></span>
+      </form>
+    </td>
   </tr>
 </table>
-<center>
-  <form name="search" action="">
-    <input type="text" size="30" name="query" onkeyup="Search()"/>
-    <br/>
-    <span id="suggestions"></span>
-  </form>
-</center>
+</body>
 </%def>
