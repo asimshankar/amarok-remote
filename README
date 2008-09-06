@@ -1,3 +1,15 @@
-# Using dcopext from python-kde3 on ubuntu
-apt-get install python-mako python-wsgiref python-simplejson python-kde3
+REQUIREMENTS:
+- Python
+- Amarok
+- The following python libraries - mako, simplejson and dcopext
+  dcopext is part of the python-kde3 package in Ubuntu.
+  If you're using Ubuntu, the follow should work:
+  sudo apt-get install python-mako python-simplejson python-kde3
+
+TO RUN:
+- Simply execute: ./main.py --port 8080
+  Then visit "http://localhost:8080" or "http://<hostname>:8080" from a
+  remote browser.
+
+- For more details, see ./main.py --help
 
