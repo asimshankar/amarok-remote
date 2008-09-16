@@ -22,6 +22,14 @@ function Search() {
   });
 }
 
+function SetCoverImage(image) {
+  var path = "covers/" + image;
+  var elem = document.getElementById("cover");
+  if (elem.src != path) {
+    elem.src = path;
+  }
+}
+
 function Status(command) {
   SendRPC("ajax/" + command, function(response) {
     var r = JSON.parse(response);
@@ -29,6 +37,7 @@ function Status(command) {
     document.getElementById("album").innerHTML = r.track.album;
     document.getElementById("artist").innerHTML = r.track.artist;
     document.getElementById("volume").innerHTML = r.volume;
+    SetCoverImage(r.track.cover_image)
     if (r.volume == 0) {
       document.getElementById("voldown").style.display = "none";
     } else {

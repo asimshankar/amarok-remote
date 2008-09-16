@@ -18,6 +18,9 @@ class RequestInterface:
   def Path(self):
     raise Exception("Path() not implemented")
 
+  def ClientAddress(self):
+    raise Exception("ClientAddress() not implemented")
+
 
 class Handler:
   def __init__(self, request):
@@ -33,9 +36,12 @@ class Handler:
 
     (topdir, suffix) = util.SplitPath(self.path)
     if topdir == "static":
-      self._Static(suffix)
+      self._HandleLocalFile(self.path)
     elif topdir == "ajax":
       self._RunAjax(suffix)
+    elif topdir == "covers":
+      image_path = Amarok.Amarok().CoverImagePath(suffix)
+      self._HandleLocalFile(path=image_path, content_type="images/jpeg")
     elif topdir == "":
       self._Render(suffix)
     else:
@@ -120,32 +126,27 @@ class Handler:
       headers = { 'Content-Type': 'text/html' }
       self.request.Respond(code = 200, headers = headers, txt = output)
 
-  def _Static(self, path):
-    path = os.path.join("static", path)
+  def _HandleLocalFile(self, path, content_type = ""):
     data = ""
     try:
       fd = open(path)
       data = fd.read()
     except (OSError, IOError), e:
-      logging.error("Bad static request (%s) from %s:%d (Exception %s)" %
-                    (path,
-                     self.client_address[0],
-                     self.client_address[1],
-                     e))
-      self.log_request()
+      logging.error("Bad static request (%s) from %s (Exception %s)" %
+                    (path, self.request.ClientAddress(), e))
       self._NotFound()
       return
 
-    content_type = ''
-    extension = os.path.splitext(path)[1]
-    if extension == ".png":
-      content_type = "images/jpeg"
-    elif extension == ".js":
-      content_type = "text/javascript"
-    elif extension == ".css":
-      content_type = "text/css"
-    else:
-      content_type = "images/jpeg"
+    if not content_type:
+      extension = os.path.splitext(path)[1]
+      if extension == ".png":
+        content_type = "images/jpeg"
+      elif extension == ".js":
+        content_type = "text/javascript"
+      elif extension == ".css":
+        content_type = "text/css"
+      else:
+        content_type = "images/jpeg"
 
     headers = { 'Content-Type': content_type }
     self.request.Respond(code = 200, headers = headers, txt = data)

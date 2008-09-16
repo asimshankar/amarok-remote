@@ -81,6 +81,7 @@ class Amarok:
       return
     self._player = _SafeDCOPObj(self._app.player)
     self._playlist = _SafeDCOPObj(self._app.playlist)
+    self._cover_image_dir = os.path.dirname(self._player.coverImage())
 
   def _AddError(self, error):
     self._errors.append(error)
@@ -110,6 +111,7 @@ class Amarok:
     public['title'] = self._player.title()
     public['album'] = self._player.album()
     public['artist'] = self._player.artist()
+    public['cover_image'] = os.path.basename(self._player.coverImage())
 
     totaltime = self._player.trackTotalTime()
     currtime = self._player.trackCurrentTime()
@@ -117,6 +119,9 @@ class Amarok:
     private['total_time'] = totaltime
     private['time_left'] = totaltime - currtime
     return _DictionaryWrapper(public, private)
+
+  def CoverImagePath(self, image):
+    return os.path.join(self._cover_image_dir, image)
 
   def IsPlaying(self):
     return self._player.isPlaying()

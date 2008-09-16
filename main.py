@@ -18,6 +18,10 @@ class BaseHTTPRequestHandlerRequest(handler.RequestInterface):
   def Path(self):
     return self._request.path
 
+  def ClientAddress(self):
+    addr = self._request.client_address
+    return "%s:%d" % (addr[0], addr[1])
+
   def Respond(self, code = 200, headers = {}, txt = ''):
     self._request.send_response(code)
     headers['Content-Length'] = len(txt)
