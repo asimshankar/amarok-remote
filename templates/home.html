@@ -9,50 +9,44 @@
 
 <%def name="Content()">
 <body onload="Status('status')">
-<table width="100%">
-  <tr>
-    <td><a href="javascript:Status('prev')"><img src="static/prev.png" alt="Previous"/></a></td>
-    <td><a href="javascript:Status('playpause')">
-       <img id="playbutton" src="static/pause.png" alt="PlayPause"/>
-    </a></td>
-    <td><a href="javascript:Status('next')"><img src="static/next.png" alt="Next"/></a></td>
-  </tr>
-</table>
-<table border=0>
-  <tr>
-    <td valign=top><b>Title:</b></td>
-    <td valign=top id="title"></td>
-    <td valign=top rowspan=4><img src="" id="cover" height=80 width=80></td>
-  </tr>
-  <tr>
-    <td valign=top><b>Album:</b></td>
-    <td valign=top id="album"></td>
-  </tr>
-  <tr>
-    <td valign=top><b>Artist:</b></td>
-    <td valign=top id="artist"></td>
-  </tr>
-  <tr>
-    <td valign=top><b>Volume:</b></td>
-    <td valign=top>
-      <a href="javascript:ChangeVolume(10)">
-      <img src="static/plus.png" alt="up" id="volup">
-      </a>
-      &nbsp;&nbsp;<span id="volume"></span>&nbsp;&nbsp;
-      <a href="javascript:ChangeVolume(-10)">
-      <img src="static/minus.png" alt="down" id="voldown">
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td valign=top><b>Search:</b></td>
-    <td valign=top colspan=2>
-      <form name="form" action="">
-        <input type="text" size="30" name="query" onkeyup="Search()"/><br/>
-        <span id="suggestions"></span>
-      </form>
-    </td>
-  </tr>
-</table>
+
+  <div id='volume_controls'>
+    <b>Vol</b>
+    <a href="javascript:ChangeVolume(10)"><img src="static/plus.png" alt="up" id="volup"></a>
+    <br/>
+    <div id="volume"></div>
+    <a href="javascript:ChangeVolume(-10)"><img src="static/minus.png" alt="down" id="voldown"></a>
+  </div>
+
+  <div id='playing' class='song'>
+    <span class='cover'>
+      <img src="" id="cover" height=80 width=80 alt="[cover]">
+    </span>
+    <span id="title" class='title'></span><p/>
+    <span id="artist" class='artist'></span><br/>
+    <span id="album" class='album'</span>
+  </div>
+
+  <table width="100%">
+    <tr>
+      <td class='prev'><a href="javascript:Status('prev')"><img src="static/prev.png" alt="Previous" width=50 height=50 /></a></td>
+      <td class='playpause'><a href="javascript:Status('playpause')">
+        <img id="playbutton" src="static/pause.png" alt="PlayPause" width=50 height=50 />
+      </a></td>
+      <td class='next'><a href="javascript:Status('next')"><img src="static/next.png" alt="Next" width=50 height=50 /></a></td>
+    </tr>
+  </table>
+
+  <table border=0>
+    <tr>
+      <td valign=top><b>Search:</b></td>
+      <td valign=top colspan=2>
+        <form name="form" action="">
+          <input type="text" size="30" name="query" onkeyup="Search()"/><br/>
+        </form>
+      </td>
+    </tr>
+  </table>
+  <span id="suggestions"></span>
 </body>
 </%def>

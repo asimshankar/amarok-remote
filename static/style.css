@@ -1,3 +1,56 @@
-body { background-color: #99ccff }
-a img { border: none }
-a { color: green }
+body {  background-color:#efefef;i }
+input { background-color:#ffffef; }
+a img { border:none; }
+#suggestions a {
+  color:black;
+  text-decoration:none;
+  border-bottom:1px solid #ccc;
+  display:block;
+  padding:5px;
+}
+#suggestions a:hover {
+  background:color:#ffffef;
+}
+.song {
+  clear:both;
+  display:inline;
+}
+.song .cover {
+  float:left;
+  padding-right:5px;
+}
+.song .path {
+  display:block;
+  color:#ccc;
+}
+#playing {
+  background:#FFF;
+  display:block;
+  border:1px solid #ccc;
+  height:10%;
+  margin-right:13%;
+  padding:10px;
+  overflow:auto;
+}
+#playing.song { display:block; }
+#playing.song .album {
+  display:block;
+  color:#ccc;
+}
+#volume_controls {
+  width:10%;
+  position:absolute;
+  right:0;
+}
+#volume_controls b { display:block; }
+#volume { text-align:center; }
+.prev,.playpause,.next {
+  text-align:center;
+}
+.song .id,.song .album { color:#ccc; }
+.song .artist { clear; }
+#suggestions {
+  height: 30%;
+  overflow: auto;
+}
+#suggestions li:nth-child(2n+1) { background:white;}

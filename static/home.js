@@ -8,17 +8,13 @@ function Search() {
     var results = JSON.parse(response);
     var box = document.getElementById("suggestions");
     var txt = "";
-    box.innerHTML = "";
+    box.innerHTML = "<ul>";
     for (var i = 0; i < results.length; ++i) {
       var r = results[i];
-      if (i != 0) {
-        txt = " &mdash; ";
-      } else {
-        txt = "";
-      }
-      txt += "<a href='javascript:JumpTo(" + r.id + ")'>" + r.name + "</a>";
-      box.innerHTML += txt;
+      txt += "<li><a href='javascript:JumpTo(" + r.id + ")'>" + r.name + "</a></li>";
     }
+    box.innerHTML += txt;
+    box.innerHTML += "</ul>";
   });
 }
 
@@ -34,8 +30,8 @@ function Status(command) {
   SendRPC("ajax/" + command, function(response) {
     var r = JSON.parse(response);
     document.getElementById("title").innerHTML = r.track.title;
-    document.getElementById("album").innerHTML = r.track.album;
     document.getElementById("artist").innerHTML = r.track.artist;
+    document.getElementById("album").innerHTML = r.track.album;
     document.getElementById("volume").innerHTML = r.volume;
     SetCoverImage(r.track.cover_image)
     if (r.volume == 0) {
