@@ -28,8 +28,10 @@ class Handler:
 
   def Get(self):
     (self.path, self.params) = util.ParseRequestPath(self.request.Path())
+    logging.debug(self.path)
     if self.path == "apple-touch-icon.png" or \
-       self.path == "apple-touch-icon-precomposed.png":
+       self.path == "apple-touch-icon-precomposed.png" or \
+       self.path == "favicon.ico":
       # Icon for iPhone webclip
       # See https://developer.apple.com/webapps/docs_iphone/documentation/AppleApplications/Reference/SafariWebContent/OptimizingforSafarioniPhone/chapter_3_section_4.html
       self.path = "static/apple-touch-icon.png"
