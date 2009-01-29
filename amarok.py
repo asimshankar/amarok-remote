@@ -3,6 +3,10 @@ import logging
 import os
 import util
 
+def _UnicodeToAscii(string):
+  """Converts a given string (ascii or unicode) into a unicode-escaped ASCII string"""
+  return unicode(string).encode('utf-8')
+
 class _DictionaryWrapper(object):
   """Wrapper around a public and private dictionary.
 
@@ -49,7 +53,9 @@ class _SafeDCOPMeth:
   def __call__(self, *args):
     (ok, result) = self._dcop_method.__call__(*args)
     if not ok:
-      raise RuntimeError(str(ok) + " -- " + str(result))
+      raise RuntimeError(str(self) + ": " + str(ok) + " -- " + str(result))
+    else:
+      logging.debug(str(self) + ": " + str(ok) + " -- " + _UnicodeToAscii(result))
     return result
 
   def __str__(self):

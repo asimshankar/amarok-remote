@@ -6,6 +6,9 @@ REQUIREMENTS:
   If you're using Ubuntu, the follow should work:
   sudo apt-get install python-mako python-simplejson python-kde3
 
+  Note that if you're using KDE4, you still need 'python-kde3' for the dcopext
+  python library
+
 TO RUN:
 - Simply execute: ./main.py --port 8080
   Then visit "http://localhost:8080" or "http://<hostname>:8080" from a
